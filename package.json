@@ -1,0 +1,39 @@
+{
+  "name": "@jupyterlite/litegitpuller",
+  "version": "0.0.1-dev.0",
+  "description": "A jupyterlite extension to automatize the clone of github repository.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}"
+  ],
+  "devDependencies": {
+    "@jupyterlab/builder": "~3.5.3",
+    "css-loader": "^6.2.0",
+    "style-loader": "^3.2.1",
+    "typescript": "~4.1.3"
+  },
+  "dependencies": {
+    "@jupyterlab/application": "~3.5.3",
+    "@jupyterlab/coreutils": "~5.5.3",
+    "@jupyterlab/filebrowser": "~3.5.3",
+    "@jupyterlab/services": "~6.5.3"
+  },
+  "resolutions": {
+    "@jupyterlab/docprovider": "~3.5.3",
+    "@jupyterlab/docregistry": "~3.5.3",
+    "@jupyterlab/rendermime-interfaces": "~3.5.3",
+    "@jupyterlab/services": "~6.5.3"
+  },
+  "scripts": {
+    "build": "jlpm build:lib && jlpm build:labextension:dev",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build:lib": "tsc",
+    "install:labextension": "jlpm build"
+  },
+  "jupyterlab": {
+    "extension": true,
+    "outputDir": "litegitpuller/labextension"
+  }
+}
