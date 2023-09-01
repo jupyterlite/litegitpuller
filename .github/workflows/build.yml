@@ -149,4 +149,4 @@ jobs:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - uses: jupyterlab/maintainer-tools/.github/actions/check-links@v1
         with:
-          ignore_links: "https://playwright.dev/docs/intro/"
+          ignore_links: "https://playwright.dev/docs/intro/ https://mybinder.org/v2/gh/jupyterlite/litegitpuller/main?urlpath=lab"
