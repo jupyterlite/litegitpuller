@@ -55,7 +55,10 @@
     "watch:labextension": "jupyter labextension watch ."
   },
   "dependencies": {
-    "@jupyterlab/application": "^3.1.0"
+    "@jupyterlab/application": "^3.1.0",
+    "@jupyterlab/coreutils": "~5.1.0",
+    "@jupyterlab/filebrowser": "~3.1.0",
+    "@jupyterlab/services": "~6.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
@@ -82,6 +85,12 @@
   },
   "resolutions": {
     "@jupyterlab/application": "~3.5.3",
+    "@jupyterlab/coreutils": "~5.5.3",
+    "@jupyterlab/docprovider": "~3.5.3",
+    "@jupyterlab/docregistry": "~3.5.3",
+    "@jupyterlab/filebrowser": "~3.5.3",
+    "@jupyterlab/rendermime-interfaces": "~3.5.3",
+    "@jupyterlab/services": "~6.5.3",
     "@lumino/coreutils": "^1.11.0",
     "@lumino/widgets": "^1.37.2"
   },
