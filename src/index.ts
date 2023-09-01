@@ -7,10 +7,13 @@ import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { GithubPuller } from './githubpuller';
 
 const assignmentListExtension: JupyterFrontEndPlugin<void> = {
-  id: 'nbgitpuller.plugin',
+  id: '@jupyterlite/litegitpuller.plugin',
   autoStart: true,
   requires: [IFileBrowserFactory],
   activate: (app: JupyterFrontEnd, browserFactory: IFileBrowserFactory) => {
+    console.log(
+      'JupyterLab extension @jupyterlite/litegitpuller is activated!'
+    );
     if (!(app.name === 'JupyterLite')) {
       return;
     }
