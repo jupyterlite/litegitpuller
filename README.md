@@ -6,7 +6,7 @@ A jupyterlite extension to automate cloning of a github repository.
 
 ## Docs
 
- https://litegitpuller.readthedocs.io/en/latest/index.html
+https://litegitpuller.readthedocs.io/en/latest/index.html
 
 ## Requirements
 
