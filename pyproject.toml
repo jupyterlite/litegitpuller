@@ -26,6 +26,15 @@ dependencies = [
 ]
 dynamic = ["version", "description", "authors", "urls", "keywords"]
 
+[project.optional-dependencies]
+docs = [
+    "jupyterlite-sphinx",
+    "jupyterlite-xeus-python",
+    "myst-parser",
+    "pydata_sphinx_theme",
+    "sphinx>=4"
+]
+
 [tool.hatch.version]
 source = "nodejs"
 

@@ -1,7 +1,12 @@
 # litegitpuller
 
-[![Github Actions Status](https://github.com/jupyterlite/litegitpuller/workflows/Build/badge.svg)](https://github.com/jupyterlite/litegitpuller/actions/workflows/build.yml)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlite/litegitpuller/main?urlpath=lab)
+[![Github Actions Status](https://github.com/jupyterlite/litegitpuller/workflows/Build/badge.svg)](https://github.com/jupyterlite/litegitpuller/actions/workflows/build.yml)
+
 A jupyterlite extension to automate cloning of a github repository.
+
+## Docs
+
+ https://litegitpuller.readthedocs.io/en/latest/index.html
 
 ## Requirements
 
