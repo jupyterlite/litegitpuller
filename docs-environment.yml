@@ -1,6 +1,6 @@
-name: litegitpuller-doc
+name: litegitpuller-docs
 channels:
-  -conda-forge
+  - conda-forge
 dependencies:
   - pip
   - jupyterlite-xeus-python >=0.9.0,<0.10.0

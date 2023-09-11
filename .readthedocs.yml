@@ -4,6 +4,7 @@ build:
   os: "ubuntu-22.04"
   tools:
     python: "mambaforge-4.10"
+    nodejs: "18"
 
 sphinx:
   builder: html
