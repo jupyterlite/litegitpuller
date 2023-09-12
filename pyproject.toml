@@ -80,3 +80,10 @@ before-build-python = ["jlpm clean:all"]
 
 [tool.check-wheel-contents]
 ignore = ["W002"]
+
+[tool.hatch.envs.docs]
+features = ["docs"]
+[tool.hatch.envs.docs.scripts]
+build = "sphinx-build -W -b html docs docs/_build/html"
+watch = "sphinx-autobuild -W -b html docs docs/_build/html --host 0.0.0.0"
+serve = "python -m http.server --directory docs/_build/html"
