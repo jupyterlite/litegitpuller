@@ -28,7 +28,7 @@ dynamic = ["version", "description", "authors", "urls", "keywords"]
 
 [project.optional-dependencies]
 docs = [
-    "jupyterlite-sphinx>=0.9.2",
+    "jupyterlite-sphinx>=0.9.3",
     "jupyterlite-xeus-python>=0.9.0,<0.10.0",
     "myst-parser",
     "pydata_sphinx_theme",
