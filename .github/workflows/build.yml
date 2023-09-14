@@ -38,6 +38,7 @@ jobs:
 
         jupyter labextension list
         jupyter labextension list 2>&1 | grep -ie "@jupyterlite/litegitpuller.*OK"
+        npx playwright install chromium
         python -m jupyterlab.browser_check
 
     - name: Package the extension
