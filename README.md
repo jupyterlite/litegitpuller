@@ -1,7 +1,6 @@
 # litegitpuller
 
-[![Github Actions Status](https://github.com/jupyterlite/litegitpuller/workflows/Build/badge.svg)](https://github.com/jupyterlite/litegitpuller/actions/workflows/build.yml)
-
+[![Github Actions Status](https://github.com/jupyterlite/litegitpuller.git/workflows/Build/badge.svg)](https://github.com/jupyterlite/litegitpuller.git/actions/workflows/build.yml)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlite/litegitpuller.git/main?urlpath=lab)
 A jupyterlite extension to automate cloning of a github repository.
 
 ## Docs
@@ -10,7 +9,7 @@ See [https://litegitpuller.readthedocs.io/en/latest/index.html](https://litegitp
 
 ## Requirements
 
-- JupyterLab >= 3.0
+- JupyterLab >= 4.0.0
 
 ## Install
 
@@ -91,7 +90,7 @@ jlpm test
 
 #### Integration tests
 
-This extension uses [Playwright](https://playwright.dev/docs/intro/) for the integration tests (aka user level tests).
+This extension uses [Playwright](https://playwright.dev/docs/intro) for the integration tests (aka user level tests).
 More precisely, the JupyterLab helper [Galata](https://github.com/jupyterlab/jupyterlab/tree/master/galata) is used to handle testing the extension in JupyterLab.
 
 More information are provided within the [ui-tests](./ui-tests/README.md) README.
