@@ -3,14 +3,14 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 import { PathExt } from '@jupyterlab/coreutils';
-import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
+import { IDefaultFileBrowser } from '@jupyterlab/filebrowser';
 import { GithubPuller } from './githubpuller';
 
 const gitPullerExtension: JupyterFrontEndPlugin<void> = {
   id: '@jupyterlite/litegitpuller:plugin',
   autoStart: true,
-  requires: [IFileBrowserFactory],
-  activate: (app: JupyterFrontEnd, browserFactory: IFileBrowserFactory) => {
+  requires: [IDefaultFileBrowser],
+  activate: (app: JupyterFrontEnd, defaultFileBrowser: IDefaultFileBrowser) => {
     console.log(
       'JupyterLab extension @jupyterlite/litegitpuller is activated!'
     );
@@ -40,7 +40,7 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
     }
 
     const puller = new GithubPuller({
-      browserFactory: browserFactory,
+      defaultFileBrowser: defaultFileBrowser,
       contents: app.serviceManager.contents
     });
 
