@@ -6,7 +6,7 @@ import { PathExt } from '@jupyterlab/coreutils';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { GithubPuller } from './githubpuller';
 
-const assignmentListExtension: JupyterFrontEndPlugin<void> = {
+const gitPullerExtension: JupyterFrontEndPlugin<void> = {
   id: '@jupyterlite/litegitpuller:plugin',
   autoStart: true,
   requires: [IFileBrowserFactory],
@@ -54,4 +54,4 @@ const assignmentListExtension: JupyterFrontEndPlugin<void> = {
   }
 };
 
-export default assignmentListExtension;
+export default gitPullerExtension;
