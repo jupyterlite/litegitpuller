@@ -14,7 +14,7 @@ mimetype_name: ''
 project_short_description: A jupyterlite extension to automate cloning of a github
     repository.
 python_name: litegitpuller
-repository: https://github.com/jupyterlite/litegitpuller.git
+repository: https://github.com/jupyterlite/litegitpuller
 test: true
 viewer_name: ''
 
