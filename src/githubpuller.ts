@@ -1,10 +1,10 @@
 import { PathExt } from '@jupyterlab/coreutils';
-import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
+import { IDefaultFileBrowser } from '@jupyterlab/filebrowser';
 import { Contents } from '@jupyterlab/services';
 
 export class GithubPuller {
   constructor(options: Private.IOptions) {
-    this._browserFactory = options.browserFactory;
+    this._defaultFileBrowser = options.defaultFileBrowser;
     this._contents = options.contents;
   }
 
@@ -102,7 +102,6 @@ export class GithubPuller {
     }
 
     // Upload missing files.
-    const { defaultBrowser: browser } = this._browserFactory;
     const fetchUrl = `${url}/contents/${fileUrl}?ref=${branch}`;
     const downloadUrl = await fetch(fetchUrl, {
       method: 'GET',
@@ -136,20 +135,20 @@ export class GithubPuller {
     }
 
     const file = new File([blob], filename, { type });
-    await browser.model.upload(file).then(async model => {
+    await this._defaultFileBrowser.model.upload(file).then(async model => {
       if (!(model.path === filePath)) {
         await this._contents.rename(model.path, filePath);
       }
     });
   }
 
-  private _browserFactory: IFileBrowserFactory;
+  private _defaultFileBrowser: IDefaultFileBrowser;
   private _contents: Contents.IManager;
 }
 
 namespace Private {
   export interface IOptions {
-    browserFactory: IFileBrowserFactory;
+    defaultFileBrowser: IDefaultFileBrowser;
     contents: Contents.IManager;
   }
 

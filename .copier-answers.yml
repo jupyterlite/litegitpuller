@@ -1,0 +1,20 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v4.2.4
+_src_path: https://github.com/jupyterlab/extension-template
+author_email: jupyter@googlegroups.com
+author_name: Jupyter Development Team
+data_format: string
+file_extension: ''
+has_binder: true
+has_settings: false
+kind: frontend
+labextension_name: '@jupyterlite/litegitpuller'
+mimetype: ''
+mimetype_name: ''
+project_short_description: A jupyterlite extension to automate cloning of a github
+    repository.
+python_name: litegitpuller
+repository: https://github.com/jupyterlite/litegitpuller
+test: true
+viewer_name: ''
+
