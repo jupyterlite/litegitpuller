@@ -4,7 +4,7 @@ import {
 } from '@jupyterlab/application';
 import { PathExt } from '@jupyterlab/coreutils';
 import { IDefaultFileBrowser } from '@jupyterlab/filebrowser';
-import { GithubPuller } from './githubpuller';
+import { GithubPuller } from './gitpuller';
 
 const gitPullerExtension: JupyterFrontEndPlugin<void> = {
   id: '@jupyterlite/litegitpuller:plugin',
@@ -32,13 +32,6 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
     repoUrl.hostname = 'api.github.com';
     repoUrl.pathname = `/repos${repoUrl.pathname}`;
 
-    // TODO: delete the following line as soon as a dedicated url generator is available.
-    if (filePath) {
-      filePath =
-        '/' +
-        PathExt.relative(`tree/${PathExt.basename(repoUrl.href)}`, filePath);
-    }
-
     const puller = new GithubPuller({
       defaultFileBrowser: defaultFileBrowser,
       contents: app.serviceManager.contents
@@ -46,8 +39,10 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
 
     puller.clone(repoUrl.href, branch).then(async basePath => {
       if (filePath) {
+        // TODO: delete the following line as soon as a dedicated url generator is available.
+        filePath = PathExt.relative('tree/', filePath);
         app.commands.execute('filebrowser:open-path', {
-          path: PathExt.join(basePath, filePath)
+          path: filePath
         });
       }
     });
