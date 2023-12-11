@@ -23,9 +23,9 @@ They can be (partially) generated with [nbgitpuller link generator]
 Currently the allowed parameters are:
 
 - `repo`: (**required**) the github repository to fetch.
-- `branch`: the branch of the repository to fetch (default to *main*).
+- `branch`: the branch of the repository to fetch (default to _main_).
 - `urlpath`: the path to a notebook file to open (relative to the root of the repository).
-- `provider`: The provider of the API. Currently it supports *Github* and *Gitlab* API.
+- `provider`: The provider of the API. Currently it supports _Github_ and _Gitlab_ API.
 
 ## Limitations
 
@@ -49,8 +49,8 @@ Jupyterlite embedded in the page.
 
 - Fetching a Gitlab repository:
 
-   <a href="https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgitlb.com%2Fbrichet1%2Ftesting-repo&urlpath=tree%2Ftesting-repo%2Fnotebooks%2Fsimple.ipynb&branch=main&
+  <a href="https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgitlb.com%2Fbrichet1%2Ftesting-repo&urlpath=tree%2Ftesting-repo%2Fnotebooks%2Fsimple.ipynb&branch=main&
    provider=gitlab">
-      https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgithub.com%2Fbrichet%2Ftesting-repo&urlpath=tree%2Ftesting-repo%2Fnotebooks%2Fsimple.ipynb&
-      branch=main&provider=gitlab
-   </a>
+  https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgithub.com%2Fbrichet%2Ftesting-repo&urlpath=tree%2Ftesting-repo%2Fnotebooks%2Fsimple.ipynb&
+  branch=main&provider=gitlab
+  </a>
