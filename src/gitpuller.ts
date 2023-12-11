@@ -19,10 +19,10 @@ export abstract class GitPuller {
    *
    * @param url - base URL of the repository using the API.
    * @param branch - the targeted branch.
+   * @param basePath - the base directory where to clone the repo.
    * @returns the path of the created directory.
    */
-  async clone(url: string, branch: string): Promise<string> {
-    const basePath = PathExt.basename(url);
+  async clone(url: string, branch: string, basePath: string): Promise<string> {
     await this.createTree([basePath]);
 
     const fileList = await this.getFileList(url, branch);
@@ -48,6 +48,7 @@ export abstract class GitPuller {
         value
       );
     });
+
     return basePath;
   }
 
@@ -269,6 +270,59 @@ export class GithubPuller extends GitPuller {
       .then(data => data.download_url);
 
     const resp = await fetch(downloadUrl);
+    const blob = await resp.blob();
+    const type = resp.headers.get('Content-Type') ?? '';
+
+    return { blob, type };
+  }
+}
+
+/**
+ * The class to clone a repository from a Gitlab server.
+ */
+export class GitlabPuller extends GitPuller {
+  /**
+   * Get files and directories list.
+   *
+   * @param url - base URL of the repository using the API.
+   * @param branch - the targeted branch.
+   */
+  async getFileList(url: string, branch: string): Promise<GitPuller.IFileList> {
+    const fetchUrl = `${url}/repository/tree?ref=${branch}&recursive=true`;
+    const fileList = await fetch(fetchUrl, {
+      method: 'GET'
+    })
+      .then(resp => resp.json())
+      .then(data => data as any[]);
+
+    const directories = Object.values(fileList)
+      .filter(fileDesc => fileDesc.type === 'tree')
+      .map(directory => directory.path as string);
+
+    const files = Object.values(fileList)
+      .filter(fileDesc => fileDesc.type === 'blob')
+      .map(file => file.path);
+
+    return { directories, files };
+  }
+
+  /**
+   * Get the content of a file.
+   *
+   * @param url - base URL of the repository using the API.
+   * @param path - path of the file from the root of the repository.
+   * @param branch - the targeted branch.
+   */
+  async getFile(
+    url: string,
+    path: string,
+    branch: string
+  ): Promise<GitPuller.IFile> {
+    const fetchUrl = `${url}/repository/files/${encodeURIComponent(
+      path
+    )}/raw?ref=${branch}`;
+
+    const resp = await fetch(fetchUrl);
     const blob = await resp.blob();
     const type = resp.headers.get('Content-Type') ?? '';
 

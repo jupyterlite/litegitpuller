@@ -4,7 +4,7 @@ import {
 } from '@jupyterlab/application';
 import { PathExt } from '@jupyterlab/coreutils';
 import { IDefaultFileBrowser } from '@jupyterlab/filebrowser';
-import { GithubPuller } from './gitpuller';
+import { GitPuller, GithubPuller, GitlabPuller } from './gitpuller';
 
 const gitPullerExtension: JupyterFrontEndPlugin<void> = {
   id: '@jupyterlite/litegitpuller:plugin',
@@ -25,19 +25,43 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
       return;
     }
 
+    let puller: GitPuller | null = null;
+
+    const basePath = PathExt.basename(repo);
     const branch = urlParams.get('branch') || 'main';
+    const provider = urlParams.get('provider') || 'github';
     let filePath = urlParams.get('urlpath');
 
     const repoUrl = new URL(repo);
-    repoUrl.hostname = 'api.github.com';
-    repoUrl.pathname = `/repos${repoUrl.pathname}`;
+    if (provider === 'github') {
+      if (repoUrl.hostname !== 'github.com') {
+        console.warn(
+          'litegitpuller: the URL does not match with a GITHUB repository'
+        );
+        return;
+      }
+      repoUrl.hostname = 'api.github.com';
+      repoUrl.pathname = `/repos${repoUrl.pathname}`;
+      puller = new GithubPuller({
+        defaultFileBrowser: defaultFileBrowser,
+        contents: app.serviceManager.contents
+      });
+    } else if (provider === 'gitlab') {
+      // Gitlab needs the repo path to be encoded.
+      repoUrl.pathname = `/api/v4/projects/${encodeURIComponent(
+        repoUrl.pathname.slice(1)
+      )}`;
+      puller = new GitlabPuller({
+        defaultFileBrowser: defaultFileBrowser,
+        contents: app.serviceManager.contents
+      });
+    }
 
-    const puller = new GithubPuller({
-      defaultFileBrowser: defaultFileBrowser,
-      contents: app.serviceManager.contents
-    });
+    if (!puller) {
+      return;
+    }
 
-    puller.clone(repoUrl.href, branch).then(async basePath => {
+    puller.clone(repoUrl.href, branch, basePath).then(async basePath => {
       if (filePath) {
         // TODO: delete the following line as soon as a dedicated url generator is available.
         filePath = PathExt.relative('tree/', filePath);
