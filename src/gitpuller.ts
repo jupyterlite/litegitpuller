@@ -112,12 +112,8 @@ export abstract class GitPuller {
   protected async fileExists(filePath: string): Promise<boolean> {
     return this._contents
       .get(filePath, { content: false })
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        return false;
-      });
+      .then(() => true)
+      .catch(() => false);
   }
 
   /**
