@@ -17,7 +17,9 @@ test('should emit an activation console message', async ({ page }) => {
 
   expect(
     logs.filter(
-      s => s === '@jupyterlite/litegitpuller is not activated, to avoid conflict with nbgitpuller'
+      s =>
+        s ===
+        '@jupyterlite/litegitpuller is not activated, to avoid conflict with nbgitpuller'
     )
   ).toHaveLength(1);
 });
