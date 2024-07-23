@@ -10,7 +10,7 @@ import { expect, test } from '@jupyterlab/galata';
 //This is required to ensure we capture all log messages.
 test.use({ autoGoto: false });
 
-test('should emit an activation console message', async ({ page }) => {
+test('should emit a non activation console message', async ({ page }) => {
   const logs: string[] = [];
 
   page.on('console', message => {
