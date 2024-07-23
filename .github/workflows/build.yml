@@ -128,13 +128,38 @@ jobs:
     - name: Execute integration tests
       working-directory: ui-tests
       run: |
-        jlpm playwright test
+        jlpm playwright test --project general
 
     - name: Upload Playwright Test report
       if: always()
       uses: actions/upload-artifact@v3
       with:
         name: litegitpuller-playwright-tests
+        path: |
+          ui-tests/test-results
+          ui-tests/playwright-report
+
+  nbgitpuller-test:
+    name: nbgitpuller tests
+    needs: integration-tests
+    runs-on: ubuntu-latest
+
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/pw-browsers
+
+    steps:
+    - name: Install nbgitpuller
+      run: pip install nbgitpuller
+
+    - name: Execute test
+      working-directory: ui-tests
+      run: jlpm playwright test --project nbgitpuller
+
+    - name: Upload Test report
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: litegitpuller-nbgitpuller-tests
         path: |
           ui-tests/test-results
           ui-tests/playwright-report

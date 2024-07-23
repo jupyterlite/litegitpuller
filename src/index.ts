@@ -48,7 +48,7 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
   ) => {
     if (await testNbGitPuller()) {
       console.log(
-        '@jupyterlite/litegitpuller is not activated to avoid conflict with nbgitpuller'
+        '@jupyterlite/litegitpuller is not activated, to avoid conflict with nbgitpuller'
       );
       return;
     }

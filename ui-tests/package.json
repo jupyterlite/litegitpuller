@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "start": "jupyter lab --config jupyter_server_test_config.py",
-    "test": "jlpm playwright test",
+    "test": "jlpm playwright test --project general",
+    "test:nbgitpuller": "jlpm playwright test --project nbgitpuller",
     "test:update": "jlpm playwright test --update-snapshots"
   },
   "devDependencies": {
