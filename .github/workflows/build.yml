@@ -86,6 +86,9 @@ jobs:
     name: Integration tests
     needs: build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [general, nbgitpuller]
 
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/pw-browsers
@@ -101,6 +104,10 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: extension-artifacts
+
+    - name: Install nbgitpuller
+      if: ${{ matrix.project == 'nbgitpuller' }}
+      run: pip install nbgitpuller
 
     - name: Install the extension
       run: |
@@ -134,32 +141,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v3
       with:
-        name: litegitpuller-playwright-tests
-        path: |
-          ui-tests/test-results
-          ui-tests/playwright-report
-
-  nbgitpuller-test:
-    name: nbgitpuller tests
-    needs: integration-tests
-    runs-on: ubuntu-latest
-
-    env:
-      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/pw-browsers
-
-    steps:
-    - name: Install nbgitpuller
-      run: pip install nbgitpuller
-
-    - name: Execute test
-      working-directory: ui-tests
-      run: jlpm playwright test --project nbgitpuller
-
-    - name: Upload Test report
-      if: failure()
-      uses: actions/upload-artifact@v3
-      with:
-        name: litegitpuller-nbgitpuller-tests
+        name: litegitpuller-ui-tests_${{ matrix.project }}
         path: |
           ui-tests/test-results
           ui-tests/playwright-report
