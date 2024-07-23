@@ -2,7 +2,7 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
-import { PathExt } from '@jupyterlab/coreutils';
+import { PathExt, URLExt } from '@jupyterlab/coreutils';
 import { IDefaultFileBrowser } from '@jupyterlab/filebrowser';
 import { ServerConnection } from '@jupyterlab/services';
 import { GitPuller, GithubPuller, GitlabPuller } from './gitpuller';
@@ -14,12 +14,7 @@ import { GitPuller, GithubPuller, GitlabPuller } from './gitpuller';
 export async function testNbGitPuller(): Promise<boolean> {
   // Make request to Jupyter API
   const settings = ServerConnection.makeSettings();
-  const params = {
-    repo: 'https://github.com/jupyterlite/litegitpuller',
-    branch: 'main'
-  };
-  const searchParams = new URLSearchParams(params);
-  const requestUrl = `${settings.baseUrl}git-pull/api?${searchParams}`;
+  const requestUrl = URLExt.join(settings.baseUrl, 'git-pull', 'api');
   let response: Response;
   try {
     response = await ServerConnection.makeRequest(
