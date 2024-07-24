@@ -2,21 +2,55 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
-import { PathExt } from '@jupyterlab/coreutils';
+import { PathExt, URLExt } from '@jupyterlab/coreutils';
 import { IDefaultFileBrowser } from '@jupyterlab/filebrowser';
+import { ServerConnection } from '@jupyterlab/services';
 import { GitPuller, GithubPuller, GitlabPuller } from './gitpuller';
+
+/**
+ * Test if nbgitpuller extension is also installed by requesting its Rest API.
+ * This test avoid fetching the same repository two times.
+ */
+export async function testNbGitPuller(): Promise<boolean> {
+  // Make request to Jupyter API
+  const settings = ServerConnection.makeSettings();
+  const requestUrl = URLExt.join(settings.baseUrl, 'git-pull', 'api');
+  let response: Response;
+  try {
+    response = await ServerConnection.makeRequest(
+      requestUrl,
+      { method: 'GET' },
+      settings
+    );
+  } catch (error) {
+    return false;
+  }
+
+  if (!response.ok) {
+    return false;
+  }
+
+  return true;
+}
 
 const gitPullerExtension: JupyterFrontEndPlugin<void> = {
   id: '@jupyterlite/litegitpuller:plugin',
   autoStart: true,
   requires: [IDefaultFileBrowser],
-  activate: (app: JupyterFrontEnd, defaultFileBrowser: IDefaultFileBrowser) => {
+  activate: async (
+    app: JupyterFrontEnd,
+    defaultFileBrowser: IDefaultFileBrowser
+  ) => {
+    if (await testNbGitPuller()) {
+      console.log(
+        '@jupyterlite/litegitpuller is not activated, to avoid conflict with nbgitpuller'
+      );
+      return;
+    }
+
     console.log(
       'JupyterLab extension @jupyterlite/litegitpuller is activated!'
     );
-    if (!(app.name === 'JupyterLite')) {
-      return;
-    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const repo = urlParams.get('repo');
