@@ -2,6 +2,26 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.2.0
+
+([Full Changelog](https://github.com/jupyterlite/litegitpuller/compare/v0.1.1...f83164e44cadd061bc74aef5e60ed017c59666f8))
+
+### Bugs fixed
+
+- Test if nbgitpuller extension is installed [#20](https://github.com/jupyterlite/litegitpuller/pull/20) ([@brichet](https://github.com/brichet))
+
+### Maintenance and upkeep improvements
+
+- Update releaser workflows [#19](https://github.com/jupyterlite/litegitpuller/pull/19) ([@jtpio](https://github.com/jtpio))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlite/litegitpuller/graphs/contributors?from=2023-12-19&to=2024-07-24&type=c))
+
+[@brichet](https://github.com/search?q=repo%3Ajupyterlite%2Flitegitpuller+involves%3Abrichet+updated%3A2023-12-19..2024-07-24&type=Issues) | [@github-actions](https://github.com/search?q=repo%3Ajupyterlite%2Flitegitpuller+involves%3Agithub-actions+updated%3A2023-12-19..2024-07-24&type=Issues) | [@jtpio](https://github.com/search?q=repo%3Ajupyterlite%2Flitegitpuller+involves%3Ajtpio+updated%3A2023-12-19..2024-07-24&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.1.1
 
 ([Full Changelog](https://github.com/jupyterlite/litegitpuller/compare/v0.1.0...ef363d22392b65ee2efa58c75bcbd1b98c61a1d6))
@@ -23,8 +43,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlite/litegitpuller/graphs/contributors?from=2023-09-14&to=2023-12-19&type=c))
 
 [@brichet](https://github.com/search?q=repo%3Ajupyterlite%2Flitegitpuller+involves%3Abrichet+updated%3A2023-09-14..2023-12-19&type=Issues) | [@fcollonval](https://github.com/search?q=repo%3Ajupyterlite%2Flitegitpuller+involves%3Afcollonval+updated%3A2023-09-14..2023-12-19&type=Issues) | [@github-actions](https://github.com/search?q=repo%3Ajupyterlite%2Flitegitpuller+involves%3Agithub-actions+updated%3A2023-09-14..2023-12-19&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.1.0
 
