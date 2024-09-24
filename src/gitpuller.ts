@@ -138,7 +138,7 @@ export abstract class GitPuller {
       await this._contents
         .get(filename, { content: false })
         .then(() => {
-          filename = `${filename}_${inc}`;
+          filename = `${inc}_${filename}`;
           inc++;
         })
         .catch(e => {
