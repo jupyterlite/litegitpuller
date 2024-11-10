@@ -61,7 +61,10 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
 
     let puller: GitPuller | null = null;
 
-    const basePath = PathExt.join(defaultFileBrowser.model.path, PathExt.basename(repo));
+    const basePath = PathExt.join(
+      defaultFileBrowser.model.path,
+      PathExt.basename(repo)
+    );
     const branch = urlParams.get('branch') || 'main';
     const provider = urlParams.get('provider') || 'github';
     let filePath = urlParams.get('urlpath');
