@@ -64,7 +64,7 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
     const basePath = PathExt.basename(repo);
     const branch = urlParams.get('branch') || 'main';
     const provider = urlParams.get('provider') || 'github';
-    let filePath = urlParams.get('urlpath');
+    const filePath = urlParams.get('urlpath');
 
     const repoUrl = new URL(repo);
     if (provider === 'github') {
@@ -97,10 +97,8 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
 
     puller.clone(repoUrl.href, branch, basePath).then(async basePath => {
       if (filePath) {
-        // TODO: delete the following line as soon as a dedicated url generator is available.
-        filePath = PathExt.relative('tree/', filePath);
         app.commands.execute('filebrowser:open-path', {
-          path: filePath
+          path: PathExt.join(basePath, filePath)
         });
       }
     });
