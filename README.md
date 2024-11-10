@@ -5,7 +5,7 @@ A jupyterlite extension to automate cloning of a github repository.
 
 ## Docs
 
-See [https://litegitpuller.readthedocs.io/en/latest/index.html](https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgithub.com%2Fbrichet%2Ftesting-repo&urlpath=tree%2Ftesting-repo%2Fnotebooks%2Fsimple.ipynb&branch=main)
+See [https://litegitpuller.readthedocs.io/en/latest/index.html](https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgithub.com%2Fbrichet%2Ftesting-repo&urlpath=notebooks%2Fsimple.ipynb&branch=main)
 
 ## Requirements
 
