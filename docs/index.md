@@ -43,14 +43,14 @@ Jupyterlite embedded in the page.
 
 - Fetching a Github repository:
 
-   <a href="https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgithub.com%2Fbrichet%2Ftesting-repo&urlpath=tree%2Ftesting-repo%2Fnotebooks%2Fsimple.ipynb&branch=main">
-      https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgithub.com%2Fbrichet%2Ftesting-repo&urlpath=tree%2Ftesting-repo%2Fnotebooks%2Fsimple.ipynb&branch=main
+   <a href="https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgithub.com%2Fbrichet%2Ftesting-repo&urlpath=notebooks%2Fsimple.ipynb&branch=main">
+      https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgithub.com%2Fbrichet%2Ftesting-repo&urlpath=notebooks%2Fsimple.ipynb&branch=main
    </a>
 
 - Fetching a Gitlab repository:
 
-  <a href="https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgitlab.com%2Fbrichet1%2Ftesting-repo&urlpath=tree%2Ftesting-repo%2Fnotebooks%2Fsimple.ipynb&branch=main&
+  <a href="https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgitlab.com%2Fbrichet1%2Ftesting-repo&urlpath=notebooks%2Fsimple.ipynb&branch=main&
    provider=gitlab">
-  https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgitlab.com%2Fbrichet1%2Ftesting-repo&urlpath=tree%2Ftesting-repo%2Fnotebooks%2Fsimple.ipynb&
+  https://litegitpuller.readthedocs.io/en/latest/index.html?repo=https%3A%2F%2Fgitlab.com%2Fbrichet1%2Ftesting-repo&urlpath=notebooks%2Fsimple.ipynb&
   branch=main&provider=gitlab
   </a>
