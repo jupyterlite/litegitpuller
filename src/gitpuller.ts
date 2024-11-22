@@ -26,7 +26,7 @@ export abstract class GitPuller {
     const basePathComponents = basePath.split('/');
     const basePathPrefixes = [];
     for (let i = 0; i < basePathComponents.length; i++) {
-      basePathPrefixes.push(basePathComponents.slice(0, i+1).join('/'));
+      basePathPrefixes.push(basePathComponents.slice(0, i + 1).join('/'));
     }
 
     // For a basePath 'a/b/c', create ['a', 'a/b', 'a/b/c']
