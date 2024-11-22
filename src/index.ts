@@ -64,7 +64,7 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
     const branch = urlParams.get('branch') || 'main';
     const provider = urlParams.get('provider') || 'github';
     const filePath = urlParams.get('urlpath');
-    const uploadPath = urlParams.get('uploadpath') | '/';
+    const uploadPath = urlParams.get('uploadpath') || '/';
 
     const basePath = PathExt.join(uploadPath, PathExt.basename(repo));
 
