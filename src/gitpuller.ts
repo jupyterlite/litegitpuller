@@ -103,10 +103,12 @@ export abstract class GitPuller {
         path: PathExt.dirname(directory)
       };
       // Create directory if it does not exist.
-      await this._contents.get(directory, { content: false }).catch(async () => {
-        const newDirectory = await this._contents.newUntitled(options);
-        await this._contents.rename(newDirectory.path, directory);
-      });
+      await this._contents
+        .get(directory, { content: false })
+        .catch(async () => {
+          const newDirectory = await this._contents.newUntitled(options);
+          await this._contents.rename(newDirectory.path, directory);
+        });
     }
   }
 
