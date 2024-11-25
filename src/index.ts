@@ -61,10 +61,12 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
 
     let puller: GitPuller | null = null;
 
-    const basePath = PathExt.basename(repo);
     const branch = urlParams.get('branch') || 'main';
     const provider = urlParams.get('provider') || 'github';
     const filePath = urlParams.get('urlpath');
+    const uploadPath = urlParams.get('uploadpath') || '/';
+
+    const basePath = PathExt.join(uploadPath, PathExt.basename(repo));
 
     const repoUrl = new URL(repo);
     if (provider === 'github') {
@@ -95,10 +97,10 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
       return;
     }
 
-    puller.clone(repoUrl.href, branch, basePath).then(async basePath => {
+    puller.clone(repoUrl.href, branch, basePath).then(repoPath => {
       if (filePath) {
         app.commands.execute('filebrowser:open-path', {
-          path: PathExt.join(basePath, filePath)
+          path: PathExt.join(repoPath, filePath)
         });
       }
     });

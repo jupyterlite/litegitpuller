@@ -23,7 +23,14 @@ export abstract class GitPuller {
    * @returns the path of the created directory.
    */
   async clone(url: string, branch: string, basePath: string): Promise<string> {
-    await this.createTree([basePath]);
+    const basePathComponents = basePath.split('/');
+    const basePathPrefixes = [];
+    for (let i = 0; i < basePathComponents.length; i++) {
+      basePathPrefixes.push(basePathComponents.slice(0, i + 1).join('/'));
+    }
+
+    // For a basePath 'a/b/c', create ['a', 'a/b', 'a/b/c']
+    await this.createTree(basePathPrefixes);
 
     const fileList = await this.getFileList(url, branch);
 
@@ -96,11 +103,12 @@ export abstract class GitPuller {
         path: PathExt.dirname(directory)
       };
       // Create directory if it does not exist.
-      await this._contents.get(directory, { content: false }).catch(() => {
-        this._contents.newUntitled(options).then(async newDirectory => {
+      await this._contents
+        .get(directory, { content: false })
+        .catch(async () => {
+          const newDirectory = await this._contents.newUntitled(options);
           await this._contents.rename(newDirectory.path, directory);
         });
-      });
     }
   }
 

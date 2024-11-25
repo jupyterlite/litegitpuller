@@ -25,7 +25,8 @@ Currently the allowed parameters are:
 - `repo`: (**required**) the github repository to fetch.
 - `branch`: the branch of the repository to fetch (default to _main_).
 - `urlpath`: the path to a notebook file to open (relative to the root of the repository).
-- `provider`: The provider of the API. Currently it supports _Github_ and _Gitlab_ API.
+- `provider`: the provider of the API. Currently it supports _Github_ and _Gitlab_ API.
+- `uploadpath`: the path to the directory in which the repository directory is created.
 
 ## Limitations
 
