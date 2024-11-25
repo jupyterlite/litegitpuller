@@ -2,6 +2,26 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.3.0
+
+([Full Changelog](https://github.com/jupyterlite/litegitpuller/compare/v0.2.1...6d326045b01e6e239aff4730bc97d13a376bf5a1))
+
+### Enhancements made
+
+- Upload to a user-provided `uploadpath` [#26](https://github.com/jupyterlite/litegitpuller/pull/26) ([@juntyr](https://github.com/juntyr))
+
+### Bugs fixed
+
+- Use filepath relative to repo root [#24](https://github.com/jupyterlite/litegitpuller/pull/24) ([@juntyr](https://github.com/juntyr))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlite/litegitpuller/graphs/contributors?from=2024-10-02&to=2024-11-25&type=c))
+
+[@brichet](https://github.com/search?q=repo%3Ajupyterlite%2Flitegitpuller+involves%3Abrichet+updated%3A2024-10-02..2024-11-25&type=Issues) | [@github-actions](https://github.com/search?q=repo%3Ajupyterlite%2Flitegitpuller+involves%3Agithub-actions+updated%3A2024-10-02..2024-11-25&type=Issues) | [@jtpio](https://github.com/search?q=repo%3Ajupyterlite%2Flitegitpuller+involves%3Ajtpio+updated%3A2024-10-02..2024-11-25&type=Issues) | [@juntyr](https://github.com/search?q=repo%3Ajupyterlite%2Flitegitpuller+involves%3Ajuntyr+updated%3A2024-10-02..2024-11-25&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.2.1
 
 ([Full Changelog](https://github.com/jupyterlite/litegitpuller/compare/v0.2.0...f3447162bc3c1edff73fefe4151eeb6f022dbbcb))
@@ -15,8 +35,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlite/litegitpuller/graphs/contributors?from=2024-07-24&to=2024-10-02&type=c))
 
 [@jtpio](https://github.com/search?q=repo%3Ajupyterlite%2Flitegitpuller+involves%3Ajtpio+updated%3A2024-07-24..2024-10-02&type=Issues) | [@juntyr](https://github.com/search?q=repo%3Ajupyterlite%2Flitegitpuller+involves%3Ajuntyr+updated%3A2024-07-24..2024-10-02&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.2.0
 

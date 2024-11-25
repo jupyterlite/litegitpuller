@@ -1,6 +1,6 @@
 {
     "name": "@jupyterlite/litegitpuller",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "description": "A jupyterlite extension to automate cloning of a github repository.",
     "keywords": [
         "jupyter",
