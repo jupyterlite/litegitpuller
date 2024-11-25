@@ -97,7 +97,7 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
       return;
     }
 
-    puller.clone(repoUrl.href, branch, basePath).then(async repoPath => {
+    puller.clone(repoUrl.href, branch, basePath).then(repoPath => {
       if (filePath) {
         app.commands.execute('filebrowser:open-path', {
           path: PathExt.join(repoPath, filePath)
