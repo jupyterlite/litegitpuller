@@ -3,8 +3,11 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 import { PathExt, URLExt } from '@jupyterlab/coreutils';
-import { IDefaultFileBrowser } from '@jupyterlab/filebrowser';
-import { ServerConnection } from '@jupyterlab/services';
+import {
+  Contents,
+  IDefaultDrive,
+  ServerConnection
+} from '@jupyterlab/services';
 import { GitPuller, GithubPuller, GitlabPuller } from './gitpuller';
 
 /**
@@ -36,11 +39,8 @@ export async function testNbGitPuller(): Promise<boolean> {
 const gitPullerExtension: JupyterFrontEndPlugin<void> = {
   id: '@jupyterlite/litegitpuller:plugin',
   autoStart: true,
-  requires: [IDefaultFileBrowser],
-  activate: async (
-    app: JupyterFrontEnd,
-    defaultFileBrowser: IDefaultFileBrowser
-  ) => {
+  requires: [IDefaultDrive],
+  activate: async (app: JupyterFrontEnd, drive: Contents.IDrive) => {
     if (await testNbGitPuller()) {
       console.log(
         '@jupyterlite/litegitpuller is not activated, to avoid conflict with nbgitpuller'
@@ -68,28 +68,19 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
 
     const basePath = PathExt.join(uploadPath, PathExt.basename(repo));
 
-    const repoUrl = new URL(repo);
     if (provider === 'github') {
-      if (repoUrl.hostname !== 'github.com') {
+      if (new URL(repo).hostname !== 'github.com') {
         console.warn(
           'litegitpuller: the URL does not match with a GITHUB repository'
         );
         return;
       }
-      repoUrl.hostname = 'api.github.com';
-      repoUrl.pathname = `/repos${repoUrl.pathname}`;
       puller = new GithubPuller({
-        defaultFileBrowser: defaultFileBrowser,
-        contents: app.serviceManager.contents
+        drive: drive
       });
     } else if (provider === 'gitlab') {
-      // Gitlab needs the repo path to be encoded.
-      repoUrl.pathname = `/api/v4/projects/${encodeURIComponent(
-        repoUrl.pathname.slice(1)
-      )}`;
       puller = new GitlabPuller({
-        defaultFileBrowser: defaultFileBrowser,
-        contents: app.serviceManager.contents
+        drive: drive
       });
     }
 
@@ -97,7 +88,7 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
       return;
     }
 
-    puller.clone(repoUrl.href, branch, basePath).then(repoPath => {
+    puller.clone(repo, branch, basePath).then(repoPath => {
       if (filePath) {
         app.commands.execute('filebrowser:open-path', {
           path: PathExt.join(repoPath, filePath)

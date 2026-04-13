@@ -1,6 +1,6 @@
 import { PathExt } from '@jupyterlab/coreutils';
-import { IDefaultFileBrowser } from '@jupyterlab/filebrowser';
 import { Contents } from '@jupyterlab/services';
+import { ZipReader } from '@zip.js/zip.js';
 
 /**
  * The abstract class for GitPuller using API.
@@ -10,8 +10,7 @@ export abstract class GitPuller {
    * The constructor for the GitPuller abstract class.
    */
   constructor(options: GitPuller.IOptions) {
-    this._defaultFileBrowser = options.defaultFileBrowser;
-    this._contents = options.contents;
+    this._drive = options.drive;
   }
 
   /**
@@ -32,22 +31,20 @@ export abstract class GitPuller {
     // For a basePath 'a/b/c', create ['a', 'a/b', 'a/b/c']
     await this.createTree(basePathPrefixes);
 
-    const fileList = await this.getFileList(url, branch);
-
-    await this.createTree(fileList.directories, basePath).then(async () => {
-      for (const file of fileList.files) {
-        const filePath = basePath ? PathExt.join(basePath, file) : file;
+    for await (const entry of this.getEntries(url, branch)) {
+      if (entry.file) {
+        const filePath = basePath
+          ? PathExt.join(basePath, entry.path)
+          : entry.path;
         if (await this.fileExists(filePath)) {
           this.addUploadError('File already exist', filePath);
           continue;
         }
-
-        // Upload missing files.
-        const fileContent = await this.getFile(url, file, branch);
-
-        await this.createFile(filePath, fileContent.blob, fileContent.type);
+        await this.createFile(filePath, entry.blob);
+      } else {
+        await this.createTree([entry.path], basePath);
       }
-    });
+    }
 
     this._errors.forEach((value, key) => {
       console.warn(
@@ -60,30 +57,18 @@ export abstract class GitPuller {
   }
 
   /**
-   * Get files and directories list.
+   * Get the file and directory entries.
+   * Directories must be returned before the files or directories contained within them.
+   * Files may be returned in any order.
    * This function must be defined by the classes that extends this one.
    *
    * @param url - base URL of the repository using the API.
    * @param branch - the targeted branch.
    */
-  abstract getFileList(
+  abstract getEntries(
     url: string,
     branch: string
-  ): Promise<GitPuller.IFileList>;
-
-  /**
-   * Get the content of a file.
-   * This function must be defined by the classes that extends this one.
-   *
-   * @param url - base URL of the repository using the API.
-   * @param path - path of the file from the root of the repository.
-   * @param branch - the targeted branch.
-   */
-  abstract getFile(
-    url: string,
-    path: string,
-    branch: string
-  ): Promise<GitPuller.IFile>;
+  ): AsyncIterable<GitPuller.IFile | GitPuller.IDirectory>;
 
   /**
    * Create empty directories in content manager.
@@ -103,12 +88,10 @@ export abstract class GitPuller {
         path: PathExt.dirname(directory)
       };
       // Create directory if it does not exist.
-      await this._contents
-        .get(directory, { content: false })
-        .catch(async () => {
-          const newDirectory = await this._contents.newUntitled(options);
-          await this._contents.rename(newDirectory.path, directory);
-        });
+      await this._drive.get(directory, { content: false }).catch(async () => {
+        const newDirectory = await this._drive.newUntitled(options);
+        await this._drive.rename(newDirectory.path, directory);
+      });
     }
   }
 
@@ -118,7 +101,7 @@ export abstract class GitPuller {
    * @param filePath - the file to check.
    */
   protected async fileExists(filePath: string): Promise<boolean> {
-    return this._contents
+    return this._drive
       .get(filePath, { content: false })
       .then(() => true)
       .catch(() => false);
@@ -131,11 +114,7 @@ export abstract class GitPuller {
    * @param blob - the file content.
    * @param type - the file type.
    */
-  protected async createFile(
-    filePath: string,
-    blob: Blob,
-    type: string
-  ): Promise<void> {
+  protected async createFile(filePath: string, blob: Blob): Promise<void> {
     let filename = PathExt.basename(filePath);
     let inc = 0;
     let uniqueFilename = false;
@@ -143,7 +122,7 @@ export abstract class GitPuller {
     // The file must be first created at root path and then moved to its final path.
     // Let's ensure an other file with the same name does not exists at root.
     while (!uniqueFilename) {
-      await this._contents
+      await this._drive
         .get(filename, { content: false })
         .then(() => {
           filename = `${inc}_${filename}`;
@@ -154,12 +133,23 @@ export abstract class GitPuller {
         });
     }
 
-    const file = new File([blob], filename, { type });
-    await this._defaultFileBrowser.model.upload(file).then(async model => {
-      if (!(model.path === filePath)) {
-        await this._contents.rename(model.path, filePath);
-      }
+    const ext = PathExt.extname(filePath);
+
+    const newFile = await this._drive.newUntitled({
+      type: (ext === '.ipynb' ? 'notebook' : 'file') as Contents.ContentType,
+      path: PathExt.dirname(filePath),
+      ext: ext
     });
+    await this._drive.save(newFile.path, {
+      content:
+        newFile.format === 'json'
+          ? JSON.parse(await blob.text())
+          : newFile.format === 'text'
+            ? await blob.text()
+            : await blobToBase64(blob),
+      size: blob.size
+    });
+    await this._drive.rename(newFile.path, filePath);
   }
 
   /**
@@ -174,8 +164,26 @@ export abstract class GitPuller {
   }
 
   protected _errors = new Map<string, string[]>();
-  protected _defaultFileBrowser: IDefaultFileBrowser;
-  protected _contents: Contents.IManager;
+  protected _drive: Contents.IDrive;
+}
+
+/**
+ * Convert a blob to a base64 string.
+ *
+ * Adopted from https://stackoverflow.com/a/61226119.
+ *
+ * @param blob - the blob to convert.
+ */
+function blobToBase64(blob: Blob): Promise<string> {
+  const reader = new FileReader();
+  reader.readAsDataURL(blob);
+  return new Promise(resolve => {
+    reader.onloadend = () => {
+      // @ts-expect-error: readAsDataURL provides a string result
+      const result: string = reader.result;
+      resolve(result.slice('data:*/*;base64,'.length));
+    };
+  });
 }
 
 /**
@@ -186,32 +194,24 @@ export namespace GitPuller {
    * The constructor options for the constructor.
    */
   export interface IOptions {
-    defaultFileBrowser: IDefaultFileBrowser;
-    contents: Contents.IManager;
+    drive: Contents.IDrive;
   }
 
   /**
-   * The files and directories list.
+   * A directory.
    */
-  export interface IFileList {
-    directories: string[];
-    files: string[];
+  export interface IDirectory {
+    file: false;
+    path: string;
   }
 
   /**
-   * The file content.
+   * A file with content.
    */
   export interface IFile {
+    file: true;
+    path: string;
     blob: Blob;
-    type: string;
-  }
-
-  /**
-   * The error on file upload.
-   */
-  export interface IUploadError {
-    type: string;
-    file: string;
   }
 }
 
@@ -220,64 +220,34 @@ export namespace GitPuller {
  */
 export class GithubPuller extends GitPuller {
   /**
-   * Get files and directories list.
+   * Get the file and directory entries.
+   * Directories must be returned before the files or directories contained within them.
+   * Files may be returned in any order.
    *
    * @param url - base URL of the repository using the API.
    * @param branch - the targeted branch.
    */
-  async getFileList(url: string, branch: string): Promise<GitPuller.IFileList> {
-    const fetchUrl = `${url}/git/trees/${branch}?recursive=true`;
-    const fileList = await fetch(fetchUrl, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'User-Agent': 'request'
-      }
-    })
-      .then(resp => resp.json())
-      .then(data => data.tree as any[]);
-
-    const directories = Object.values(fileList)
-      .filter(fileDesc => fileDesc.type === 'tree')
-      .map(directory => directory.path as string);
-
-    const files = Object.values(fileList)
-      .filter(fileDesc => fileDesc.type === 'blob')
-      .map(file => file.path);
-
-    return { directories, files };
-  }
-
-  /**
-   * Get the content of a file.
-   *
-   * @param url - base URL of the repository using the API.
-   * @param path - path of the file from the root of the repository.
-   * @param branch - the targeted branch.
-   */
-  async getFile(
+  async *getEntries(
     url: string,
-    path: string,
     branch: string
-  ): Promise<GitPuller.IFile> {
-    const fetchUrl = `${url}/contents/${path}?ref=${branch}`;
-    const downloadUrl = await fetch(fetchUrl, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'User-Agent': 'request'
+  ): AsyncIterable<GitPuller.IFile | GitPuller.IDirectory> {
+    // https://github.com/<USER>/<REPO>/archive/refs/heads/<BRANCH>.tar.gz
+    const fetchUrl = `${url}/archive/refs/heads/${branch}.zip`;
+    const archive = await fetch(fetchUrl);
+
+    const zipReader = new ZipReader(archive.body!);
+
+    for await (const entry of zipReader.getEntriesGenerator()) {
+      if (entry.directory) {
+        yield { file: false, path: entry.filename };
+      } else {
+        yield {
+          file: true,
+          path: entry.filename,
+          blob: new Blob([await entry.arrayBuffer()])
+        };
       }
-    })
-      .then(resp => resp.json())
-      .then(data => data.download_url);
-
-    const resp = await fetch(downloadUrl);
-    const blob = await resp.blob();
-    const type = resp.headers.get('Content-Type') ?? '';
-
-    return { blob, type };
+    }
   }
 }
 
@@ -286,50 +256,37 @@ export class GithubPuller extends GitPuller {
  */
 export class GitlabPuller extends GitPuller {
   /**
-   * Get files and directories list.
+   * Get the file and directory entries.
+   * Directories must be returned before the files or directories contained within them.
+   * Files may be returned in any order.
    *
    * @param url - base URL of the repository using the API.
    * @param branch - the targeted branch.
    */
-  async getFileList(url: string, branch: string): Promise<GitPuller.IFileList> {
-    const fetchUrl = `${url}/repository/tree?ref=${branch}&recursive=true`;
-    const fileList = await fetch(fetchUrl, {
-      method: 'GET'
-    })
-      .then(resp => resp.json())
-      .then(data => data as any[]);
-
-    const directories = Object.values(fileList)
-      .filter(fileDesc => fileDesc.type === 'tree')
-      .map(directory => directory.path as string);
-
-    const files = Object.values(fileList)
-      .filter(fileDesc => fileDesc.type === 'blob')
-      .map(file => file.path);
-
-    return { directories, files };
-  }
-
-  /**
-   * Get the content of a file.
-   *
-   * @param url - base URL of the repository using the API.
-   * @param path - path of the file from the root of the repository.
-   * @param branch - the targeted branch.
-   */
-  async getFile(
+  async *getEntries(
     url: string,
-    path: string,
     branch: string
-  ): Promise<GitPuller.IFile> {
-    const fetchUrl = `${url}/repository/files/${encodeURIComponent(
-      path
-    )}/raw?ref=${branch}`;
+  ): AsyncIterable<GitPuller.IFile | GitPuller.IDirectory> {
+    // https://<HOST>/<USER>/<REPO>/-/archive/<BRANCH>/<REPO>-<BRANCH>.zip?ref_type=heads
+    const userRepo = new URL(url).pathname.split('/');
+    const fetchUrl = `${url}/-/archive/${branch}/${
+      userRepo[userRepo.length - 1]
+    }-${branch}.zip?ref_type=heads`;
 
-    const resp = await fetch(fetchUrl);
-    const blob = await resp.blob();
-    const type = resp.headers.get('Content-Type') ?? '';
+    const archive = await fetch(fetchUrl);
 
-    return { blob, type };
+    const zipReader = new ZipReader(archive.body!);
+
+    for await (const entry of zipReader.getEntriesGenerator()) {
+      if (entry.directory) {
+        yield { file: false, path: entry.filename };
+      } else {
+        yield {
+          file: true,
+          path: entry.filename,
+          blob: new Blob([await entry.arrayBuffer()])
+        };
+      }
+    }
   }
 }
