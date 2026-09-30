@@ -39,7 +39,7 @@ export abstract class GitPuller {
           this.addUploadError('File already exist', filePath);
           continue;
         }
-        await this.createFile(filePath, entry.blob);
+        await this.createFile(filePath, await entry.fetchBlob());
       } else {
         await this.createTree([entry.path], basePath);
       }
@@ -222,7 +222,7 @@ export namespace GitPuller {
   export interface IFile {
     file: true;
     path: string;
-    blob: Blob;
+    fetchBlob: () => Promise<Blob>;
   }
 }
 
@@ -263,27 +263,31 @@ export class GithubPuller extends GitPuller {
       .map(fileDesc => fileDesc.path)
       .sort();
 
+    async function fetchBlob(fetchUrl: string): Promise<Blob> {
+      const downloadUrl = await fetch(fetchUrl, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+          'User-Agent': 'request'
+        }
+      })
+        .then(resp => resp.json())
+        .then(data => data.download_url);
+
+      const resp = await fetch(downloadUrl);
+      const blob = await resp.blob();
+
+      return blob;
+    }
+
     for (const path of paths) {
       const type = pathToType.get(path);
       if (type === 'tree') {
         yield { file: false, path: path };
       } else if (type === 'blob') {
         const fetchUrl = `${url}/contents/${path}?ref=${branch}`;
-        const downloadUrl = await fetch(fetchUrl, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/vnd.github+json',
-            'X-GitHub-Api-Version': '2022-11-28',
-            'User-Agent': 'request'
-          }
-        })
-          .then(resp => resp.json())
-          .then(data => data.download_url);
-
-        const resp = await fetch(downloadUrl);
-        const blob = await resp.blob();
-
-        yield { file: true, path: path, blob: blob };
+        yield { file: true, path: path, fetchBlob: () => fetchBlob(fetchUrl) };
       }
     }
   }
@@ -307,15 +311,10 @@ export class GitlabPuller extends GitPuller {
   ): AsyncIterable<GitPuller.IFile | GitPuller.IDirectory> {
     const fetchUrl = `${url}/repository/tree?ref=${branch}&recursive=true`;
     const fileList = await fetch(fetchUrl, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'User-Agent': 'request'
-      }
+      method: 'GET'
     })
       .then(resp => resp.json())
-      .then(data => data.tree as any[]);
+      .then(data => data as any[]);
 
     const pathToType = new Map();
     for (const fileDesc of fileList) {
@@ -326,6 +325,12 @@ export class GitlabPuller extends GitPuller {
       .map(fileDesc => fileDesc.path)
       .sort();
 
+    async function fetchBlob(fetchUrl: string): Promise<Blob> {
+      const resp = await fetch(fetchUrl);
+      const blob = await resp.blob();
+      return blob;
+    }
+
     for (const path of paths) {
       const type = pathToType.get(path);
       if (type === 'tree') {
@@ -334,11 +339,7 @@ export class GitlabPuller extends GitPuller {
         const fetchUrl = `${url}/repository/files/${encodeURIComponent(
           path
         )}/raw?ref=${branch}`;
-
-        const resp = await fetch(fetchUrl);
-        const blob = await resp.blob();
-
-        yield { file: true, path: path, blob: blob };
+        yield { file: true, path: path, fetchBlob: () => fetchBlob(fetchUrl) };
       }
     }
   }
