@@ -2743,6 +2743,7 @@ __metadata:
     "@types/react-addons-linked-state-mixin": ^0.14.22
     "@typescript-eslint/eslint-plugin": ^6.1.0
     "@typescript-eslint/parser": ^6.1.0
+    "@zip.js/zip.js": 2.7.72
     css-loader: ^6.7.1
     eslint: ^8.36.0
     eslint-config-prettier: ^8.8.0
@@ -3803,6 +3804,13 @@ __metadata:
   version: 1.2.0
   resolution: "@ungap/structured-clone@npm:1.2.0"
   checksum: 4f656b7b4672f2ce6e272f2427d8b0824ed11546a601d8d5412b9d7704e83db38a8d9f402ecdf2b9063fc164af842ad0ec4a55819f621ed7e7ea4d1efcc74524
+  languageName: node
+  linkType: hard
+
+"@zip.js/zip.js@npm:2.7.72":
+  version: 2.7.72
+  resolution: "@zip.js/zip.js@npm:2.7.72"
+  checksum: bab3a9788dd0f147471d9a826a742e92e32eaa7847f7f4166370c35b0dced79ddb04d5efc5b9e0c9a343f3f973030ac2ea8016ec6faf9141add8bb374c417b84
   languageName: node
   linkType: hard
 

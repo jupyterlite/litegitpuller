@@ -68,24 +68,17 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
 
     const basePath = PathExt.join(uploadPath, PathExt.basename(repo));
 
-    const repoUrl = new URL(repo);
     if (provider === 'github') {
-      if (repoUrl.hostname !== 'github.com') {
+      if (new URL(repo).hostname !== 'github.com') {
         console.warn(
           'litegitpuller: the URL does not match with a GITHUB repository'
         );
         return;
       }
-      repoUrl.hostname = 'api.github.com';
-      repoUrl.pathname = `/repos${repoUrl.pathname}`;
       puller = new GithubPuller({
         drive: drive
       });
     } else if (provider === 'gitlab') {
-      // Gitlab needs the repo path to be encoded.
-      repoUrl.pathname = `/api/v4/projects/${encodeURIComponent(
-        repoUrl.pathname.slice(1)
-      )}`;
       puller = new GitlabPuller({
         drive: drive
       });
@@ -95,7 +88,7 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
       return;
     }
 
-    puller.clone(repoUrl.href, branch, basePath).then(repoPath => {
+    puller.clone(repo, branch, basePath).then(repoPath => {
       if (filePath) {
         app.commands.execute('filebrowser:open-path', {
           path: PathExt.join(repoPath, filePath)

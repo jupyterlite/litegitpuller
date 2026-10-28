@@ -1,5 +1,6 @@
 import { PathExt } from '@jupyterlab/coreutils';
 import { Contents } from '@jupyterlab/services';
+import { ZipReader } from '@zip.js/zip.js';
 
 /**
  * The abstract class for GitPuller using API.
@@ -242,52 +243,21 @@ export class GithubPuller extends GitPuller {
     url: string,
     branch: string
   ): AsyncIterable<GitPuller.IFile | GitPuller.IDirectory> {
-    const fetchUrl = `${url}/git/trees/${branch}?recursive=true`;
-    const fileList = await fetch(fetchUrl, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'User-Agent': 'request'
-      }
-    })
-      .then(resp => resp.json())
-      .then(data => data.tree as any[]);
+    // https://github.com/<USER>/<REPO>/archive/refs/heads/<BRANCH>.tar.gz
+    const fetchUrl = `${url}/archive/refs/heads/${branch}.zip`;
+    const archive = await fetch(fetchUrl);
 
-    const pathToType = new Map();
-    for (const fileDesc of fileList) {
-      pathToType.set(fileDesc.path, fileDesc.type);
-    }
+    const zipReader = new ZipReader(archive.body!);
 
-    const paths = Object.values(fileList)
-      .map(fileDesc => fileDesc.path)
-      .sort();
-
-    async function fetchBlob(fetchUrl: string): Promise<Blob> {
-      const downloadUrl = await fetch(fetchUrl, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/vnd.github+json',
-          'X-GitHub-Api-Version': '2022-11-28',
-          'User-Agent': 'request'
-        }
-      })
-        .then(resp => resp.json())
-        .then(data => data.download_url);
-
-      const resp = await fetch(downloadUrl);
-      const blob = await resp.blob();
-
-      return blob;
-    }
-
-    for (const path of paths) {
-      const type = pathToType.get(path);
-      if (type === 'tree') {
-        yield { file: false, path: path };
-      } else if (type === 'blob') {
-        const fetchUrl = `${url}/contents/${path}?ref=${branch}`;
-        yield { file: true, path: path, fetchBlob: () => fetchBlob(fetchUrl) };
+    for await (const entry of zipReader.getEntriesGenerator()) {
+      if (entry.directory) {
+        yield { file: false, path: entry.filename };
+      } else {
+        yield {
+          file: true,
+          path: entry.filename,
+          fetchBlob: async () => new Blob([await entry.arrayBuffer()])
+        };
       }
     }
   }
@@ -309,37 +279,25 @@ export class GitlabPuller extends GitPuller {
     url: string,
     branch: string
   ): AsyncIterable<GitPuller.IFile | GitPuller.IDirectory> {
-    const fetchUrl = `${url}/repository/tree?ref=${branch}&recursive=true`;
-    const fileList = await fetch(fetchUrl, {
-      method: 'GET'
-    })
-      .then(resp => resp.json())
-      .then(data => data as any[]);
+    // https://<HOST>/<USER>/<REPO>/-/archive/<BRANCH>/<REPO>-<BRANCH>.zip?ref_type=heads
+    const userRepo = new URL(url).pathname.split('/');
+    const fetchUrl = `${url}/-/archive/${branch}/${
+      userRepo[userRepo.length - 1]
+    }-${branch}.zip?ref_type=heads`;
 
-    const pathToType = new Map();
-    for (const fileDesc of fileList) {
-      pathToType.set(fileDesc.path, fileDesc.type);
-    }
+    const archive = await fetch(fetchUrl);
 
-    const paths = Object.values(fileList)
-      .map(fileDesc => fileDesc.path)
-      .sort();
+    const zipReader = new ZipReader(archive.body!);
 
-    async function fetchBlob(fetchUrl: string): Promise<Blob> {
-      const resp = await fetch(fetchUrl);
-      const blob = await resp.blob();
-      return blob;
-    }
-
-    for (const path of paths) {
-      const type = pathToType.get(path);
-      if (type === 'tree') {
-        yield { file: false, path: path };
-      } else if (type === 'blob') {
-        const fetchUrl = `${url}/repository/files/${encodeURIComponent(
-          path
-        )}/raw?ref=${branch}`;
-        yield { file: true, path: path, fetchBlob: () => fetchBlob(fetchUrl) };
+    for await (const entry of zipReader.getEntriesGenerator()) {
+      if (entry.directory) {
+        yield { file: false, path: entry.filename };
+      } else {
+        yield {
+          file: true,
+          path: entry.filename,
+          fetchBlob: async () => new Blob([await entry.arrayBuffer()])
+        };
       }
     }
   }
