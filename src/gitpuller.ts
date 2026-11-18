@@ -20,7 +20,12 @@ export abstract class GitPuller {
    * @param basePath - the base directory where to clone the repo.
    * @returns the path of the created directory.
    */
-  async clone(url: string, branch: string, basePath: string): Promise<string> {
+  async clone(
+    url: string,
+    branch: string,
+    basePath: string,
+    preopen: (repoPath: string) => void | Promise<void>
+  ): Promise<string> {
     const basePathComponents = basePath.split('/');
     const basePathPrefixes = [];
     for (let i = 0; i < basePathComponents.length; i++) {
@@ -29,6 +34,8 @@ export abstract class GitPuller {
 
     // For a basePath 'a/b/c', create ['a', 'a/b', 'a/b/c']
     await this.createTree(basePathPrefixes);
+
+    await preopen(basePath);
 
     for await (const entry of this.getEntries(url, branch)) {
       if (entry.file) {
