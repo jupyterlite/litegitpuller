@@ -95,13 +95,21 @@ const gitPullerExtension: JupyterFrontEndPlugin<void> = {
       return;
     }
 
-    puller.clone(repoUrl.href, branch, basePath).then(repoPath => {
-      if (filePath) {
+    puller
+      .clone(repoUrl.href, branch, basePath, repoPath => {
+        // pre-open the repo path to show some progress
         app.commands.execute('filebrowser:open-path', {
-          path: PathExt.join(repoPath, filePath)
+          path: PathExt.join(repoPath, repoPath)
         });
-      }
-    });
+      })
+      .then(repoPath => {
+        // open the file path, if provided
+        if (filePath) {
+          app.commands.execute('filebrowser:open-path', {
+            path: PathExt.join(repoPath, filePath)
+          });
+        }
+      });
   }
 };
 
